@@ -82,7 +82,10 @@ export default function CartSidebar() {
             </div>
 
             <button
-              className="mt-6 w-full bg-orange-500 text-white py-3 rounded-2xl hover:bg-orange-600 transition"
+              onClick={() =>
+                (window.location.href = "/checkout")
+              }
+              className="mt-6 w-full bg-orange-500 text-white py-3 rounded-2xl text-xl hover:bg-orange-600 transition"
             >
               Checkout
             </button>

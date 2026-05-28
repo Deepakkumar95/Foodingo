@@ -109,6 +109,11 @@ export function CartProvider({
     );
   }
 
+  // CLEAR CART
+  function clearCart() {
+    setCartItems([]);
+  }
+
   return (
     <CartContext.Provider
       value={{
@@ -117,6 +122,7 @@ export function CartProvider({
         increaseQuantity,
         decreaseQuantity,
         removeFromCart,
+        clearCart,
       }}
     >
       {children}
