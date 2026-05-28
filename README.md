@@ -29,3 +29,18 @@ A complete, production-ready food delivery platform with advanced AI/ML capabili
 1. **Install dependencies**:
 ```bash
 pip install -r requirements.txt
+
+##How to run the project
+
+    1. Create a new virtual environment
+        python -m venv venv
+
+    2. Activate the virtual environment
+        source venv/bin/activate
+    
+    3. Install all dependencies
+        pip install -r requirements.txt
+        pip install -r requirements_live.txt
+    
+    4. Run Backend
+        uvicorn live_app:app --reload --host 0.0.0.0 --port 8000
