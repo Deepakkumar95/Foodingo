@@ -1,0 +1,6 @@
+2026-05-25T18:38:15.017136|admin|/admin/system_health|success
+2026-05-25T18:38:16.100975|admin|/admin/system_health|success
+2026-05-25T18:38:17.148524|admin|/admin/system_health|success
+{"ts": "2026-05-25T18:40:26.878396", "user_id": "admin", "path": "/admin/system_health", "status": "success"}
+{"ts": "2026-05-25T18:40:27.954892", "user_id": "admin", "path": "/admin/system_health", "status": "success"}
+{"ts": "2026-05-25T18:40:29.055339", "user_id": "admin", "path": "/admin/system_health", "status": "success"}
