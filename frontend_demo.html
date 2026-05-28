@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Foodingo Live</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    boxShadow: {
+                        soft: '0 20px 50px rgba(15, 23, 42, 0.12)',
+                    },
+                },
+            },
+        };
+    </script>
+    <style>
+        body {
+            transition: background-color 0.25s ease, color 0.25s ease;
+        }
+
+        .fade-in-up {
+            animation: fadeInUp 0.7s ease both;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(18px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .backdrop-blur-panel {
+            backdrop-filter: blur(18px);
+        }
+    </style>
+</head>
+
+<body class="min-h-screen bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100">
+    <div class="relative min-h-screen overflow-hidden bg-[radial-gradient(circle_at_top,_rgba(249,115,22,0.16),_transparent_32%),radial-gradient(circle_at_bottom_right,_rgba(14,165,233,0.12),_transparent_24%)]">
+        <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+            <header class="mb-8 flex flex-col gap-5 rounded-[2rem] border border-slate-200 bg-white/85 p-5 shadow-soft dark:border-slate-800 dark:bg-slate-900/85 md:flex-row md:items-center md:justify-between">
+                <div class="space-y-4">
+                    <div class="flex flex-wrap items-center justify-between gap-3">
+                        <div class="flex items-center gap-3">
+                            <div class="flex h-12 w-12 items-center justify-center rounded-3xl bg-orange-500 text-white shadow-lg shadow-orange-500/20">F</div>
+                            <div>
+                                <p class="text-xs uppercase tracking-[0.3em] text-orange-600 dark:text-orange-400">Foodingo</p>
+                                <h1 class="text-2xl font-semibold tracking-tight sm:text-3xl">Delivering happiness, one meal at a time.</h1>
+                            </div>
+                        </div>
+                        <button id="themeToggle" class="inline-flex items-center justify-center rounded-full border border-slate-200 bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-200 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700">Dark mode</button>
+                    </div>
+                    <div class="grid gap-3 sm:grid-cols-[1fr_auto]">
+                        <form id="searchForm" class="relative">
+                            <input id="searchInput" type="search" placeholder="Search restaurants, cuisines or dishes" class="w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 pr-12 text-sm text-slate-900 outline-none transition focus:border-orange-400 focus:ring-2 focus:ring-orange-200 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:focus:border-orange-500 dark:focus:ring-orange-500/20" />
+                            <span class="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-slate-400">🔎</span>
+                        </form>
+                        <div class="flex flex-wrap items-center gap-3">
+                            <a href="#restaurants" class="rounded-full bg-orange-500 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-orange-500/20 transition hover:bg-orange-600">Restaurants</a>
+                            <button id="viewOrdersBtn" class="rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:border-orange-300 hover:bg-orange-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100">Order History</button>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="grid gap-6 xl:grid-cols-[1.8fr_1fr]">
+                <main class="space-y-6">
+                    <section class="rounded-[2rem] border border-slate-200 bg-white/85 p-6 shadow-soft backdrop-blur-panel dark:border-slate-800 dark:bg-slate-900/85">
+                        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                            <div>
+                                <p class="text-sm uppercase tracking-[0.25em] text-orange-600 dark:text-orange-400">Order now</p>
+                                <h2 class="mt-3 text-3xl font-semibold text-slate-900 dark:text-slate-100">Discover top restaurants nearby</h2>
+                            </div>
+                            <div class="grid gap-3 sm:grid-cols-3">
+                                <div class="rounded-3xl bg-slate-50 p-4 text-center dark:bg-slate-950">
+                                    <p class="text-sm uppercase tracking-[0.3em] text-slate-500 dark:text-slate-400">Restaurants</p>
+                                    <p id="restaurantsCount" class="mt-2 text-xl font-semibold text-slate-900 dark:text-slate-100">0</p>
+                                </div>
+                                <div class="rounded-3xl bg-slate-50 p-4 text-center dark:bg-slate-950">
+                                    <p class="text-sm uppercase tracking-[0.3em] text-slate-500 dark:text-slate-400">Cart items</p>
+                                    <p id="cartCount" class="mt-2 text-xl font-semibold text-slate-900 dark:text-slate-100">0</p>
+                                </div>
+                                <div class="rounded-3xl bg-slate-50 p-4 text-center dark:bg-slate-950">
+                                    <p class="text-sm uppercase tracking-[0.3em] text-slate-500 dark:text-slate-400">Orders</p>
+                                    <p id="historyCount" class="mt-2 text-xl font-semibold text-slate-900 dark:text-slate-100">0</p>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section id="restaurants" class="space-y-5">
+                        <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+                            <div>
+                                <p class="text-sm uppercase tracking-[0.25em] text-orange-600 dark:text-orange-400">Top picks</p>
+                                <h3 class="mt-2 text-2xl font-semibold text-slate-900 dark:text-slate-100">Restaurants</h3>
+                            </div>
+                            <div class="flex flex-wrap gap-2 text-sm text-slate-500 dark:text-slate-400">
+                                <span class="rounded-full border border-slate-200 bg-slate-50 px-4 py-2 dark:border-slate-700 dark:bg-slate-950">Fast delivery</span>
+                                <span class="rounded-full border border-slate-200 bg-slate-50 px-4 py-2 dark:border-slate-700 dark:bg-slate-950">Pure veg</span>
+                                <span class="rounded-full border border-slate-200 bg-slate-50 px-4 py-2 dark:border-slate-700 dark:bg-slate-950">Trending</span>
+                            </div>
+                        </div>
+                        <div id="restaurantList" class="grid gap-5 md:grid-cols-2 xl:grid-cols-2"></div>
+                    </section>
+
+                    <section id="orderHistorySection" class="hidden rounded-[2rem] border border-slate-200 bg-white/85 p-6 shadow-soft backdrop-blur-panel dark:border-slate-800 dark:bg-slate-900/85">
+                        <div class="mb-5 flex items-center justify-between gap-3">
+                            <div>
+                                <p class="text-sm uppercase tracking-[0.25em] text-orange-600 dark:text-orange-400">History</p>
+                                <h3 class="mt-2 text-2xl font-semibold text-slate-900 dark:text-slate-100">Your past orders</h3>
+                            </div>
+                            <button id="showRestaurantsBtn" class="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-orange-300 hover:bg-orange-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100">Back to menu</button>
+                        </div>
+                        <div id="orderHistoryList" class="space-y-4"></div>
+                    </section>
+                </main>
+
+                <aside class="space-y-6">
+                    <section class="rounded-[2rem] border border-slate-200 bg-white/85 p-6 shadow-soft backdrop-blur-panel dark:border-slate-800 dark:bg-slate-900/85">
+                        <div class="flex items-center justify-between gap-3">
+                            <div>
+                                <p class="text-sm uppercase tracking-[0.25em] text-orange-600 dark:text-orange-400">Cart</p>
+                                <h3 class="mt-2 text-xl font-semibold text-slate-900 dark:text-slate-100">Your order basket</h3>
+                            </div>
+                            <span id="cartTotalLabel" class="rounded-full bg-orange-50 px-3 py-1 text-sm font-semibold text-orange-700 dark:bg-orange-500/10 dark:text-orange-300">₹0</span>
+                        </div>
+                        <div id="cartItems" class="mt-6 space-y-4"></div>
+                        <div class="mt-6 space-y-3">
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">Delivery address</label>
+                                <input id="deliveryAddress" type="text" placeholder="Enter delivery address" class="mt-2 w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-orange-400 focus:ring-2 focus:ring-orange-200 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:focus:border-orange-500 dark:focus:ring-orange-500/20" />
+                            </div>
+                            <button id="checkoutBtn" class="w-full rounded-3xl bg-orange-500 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-orange-500/20 transition hover:bg-orange-600">Checkout</button>
+                            <p id="cartHelp" class="text-sm text-slate-500 dark:text-slate-400">COD support available. Razorpay integration coming soon.</p>
+                        </div>
+                    </section>
+                    <section class="rounded-[2rem] border border-slate-200 bg-white/85 p-6 shadow-soft backdrop-blur-panel dark:border-slate-800 dark:bg-slate-900/85">
+                        <p class="text-sm uppercase tracking-[0.25em] text-orange-600 dark:text-orange-400">Live tracking</p>
+                        <h3 class="mt-2 text-xl font-semibold text-slate-900 dark:text-slate-100">Order updates</h3>
+                        <div id="trackingStatus" class="mt-4 rounded-3xl bg-slate-50 p-4 text-sm text-slate-700 shadow-inner dark:bg-slate-950 dark:text-slate-200">Waiting for order updates...</div>
+                    </section>
+                </aside>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = "http://127.0.0.1:8000"; // Local backend URL for development
+
+        const state = {
+            restaurants: [],
+            filteredRestaurants: [],
+            cart: [],
+            orderHistory: [],
+            selectedRestaurantId: null,
+            loading: true,
+            view: 'restaurants'
+        };
+
+        const restaurantList = document.getElementById('restaurantList');
+        const restaurantsCount = document.getElementById('restaurantsCount');
+        const cartCount = document.getElementById('cartCount');
+        const historyCount = document.getElementById('historyCount');
+        const cartItems = document.getElementById('cartItems');
+        const cartTotalLabel = document.getElementById('cartTotalLabel');
+        const deliveryAddress = document.getElementById('deliveryAddress');
+        const checkoutBtn = document.getElementById('checkoutBtn');
+        const trackingStatus = document.getElementById('trackingStatus');
+        const orderHistorySection = document.getElementById('orderHistorySection');
+        const orderHistoryList = document.getElementById('orderHistoryList');
+        const viewOrdersBtn = document.getElementById('viewOrdersBtn');
+        const showRestaurantsBtn = document.getElementById('showRestaurantsBtn');
+        const searchForm = document.getElementById('searchForm');
+        const searchInput = document.getElementById('searchInput');
+        const themeToggle = document.getElementById('themeToggle');
+
+        const sampleMenus = {
+            r1: [
+                { id: 'm1', name: 'Paneer Tikka', description: 'Smoky paneer cubes with rich masala', price: 260, image: 'https://images.unsplash.com/photo-1601924638867-3ec8a9b4f6c1?auto=format&fit=crop&w=900&q=80' },
+                { id: 'm2', name: 'Butter Naan', description: 'Soft butter naan baked in clay oven', price: 60, image: 'https://images.unsplash.com/photo-1512058564366-c9e5b2d63c72?auto=format&fit=crop&w=900&q=80' }
+            ],
+            r2: [
+                { id: 'm3', name: 'Margherita Pizza', description: 'Classic tomato & mozzarella delight', price: 380, image: 'https://images.unsplash.com/photo-1548365328-9b5132e4c511?auto=format&fit=crop&w=900&q=80' },
+                { id: 'm4', name: 'Garlic Breadsticks', description: 'Crispy garlic bread with cheese dip', price: 120, image: 'https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=900&q=80' }
+            ]
+        };
+
+        const fallbackImages = [
+            'https://images.unsplash.com/photo-1555992336-03a23c7d5d05?auto=format&fit=crop&w=900&q=80',
+            'https://images.unsplash.com/photo-1498654896293-37aacf113fd9?auto=format&fit=crop&w=900&q=80',
+            'https://images.unsplash.com/photo-1551782450-a2132b4ba21d?auto=format&fit=crop&w=900&q=80',
+            'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=900&q=80'
+        ];
+
+        function loadState() {
+            const savedHistory = localStorage.getItem('foodingo_order_history');
+            const savedCart = localStorage.getItem('foodingo_cart');
+            state.orderHistory = savedHistory ? JSON.parse(savedHistory) : [];
+            state.cart = savedCart ? JSON.parse(savedCart) : [];
+            renderCart();
+            renderOrderHistory();
+        }
+
+        function saveState() {
+            localStorage.setItem('foodingo_order_history', JSON.stringify(state.orderHistory));
+            localStorage.setItem('foodingo_cart', JSON.stringify(state.cart));
+        }
+
+        function setView(view) {
+            state.view = view;
+            orderHistorySection.classList.toggle('hidden', view !== 'history');
+            document.getElementById('restaurants').classList.toggle('hidden', view !== 'restaurants');
+            viewOrdersBtn.classList.toggle('hidden', view === 'history');
+            showRestaurantsBtn.classList.toggle('hidden', view !== 'history');
+        }
+
+        function getMenuForRestaurant(restaurantId) {
+            return sampleMenus[restaurantId] || [];
+        }
+
+        function calculateTotals() {
+            const subtotal = state.cart.reduce((sum, item) => sum + item.quantity * item.price, 0);
+            const deliveryFee = state.cart.length > 0 ? 40 : 0;
+            return { subtotal, deliveryFee, total: subtotal + deliveryFee };
+        }
+
+        function renderCart() {
+            cartCount.textContent = state.cart.reduce((sum, item) => sum + item.quantity, 0);
+            const totals = calculateTotals();
+            cartTotalLabel.textContent = `₹${totals.total}`;
+            cartItems.innerHTML = '';
+
+            if (!state.cart.length) {
+                cartItems.innerHTML = '<div class="rounded-3xl border border-dashed border-slate-200 bg-slate-50 p-6 text-center text-slate-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400">Your cart is empty. Add dishes from the restaurant cards above.</div>';
+                return;
+            }
+
+            state.cart.forEach((item) => {
+                cartItems.innerHTML += `
+                    <div class="rounded-3xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-950">
+                        <div class="flex items-start gap-4">
+                            <div class="grow">
+                                <p class="font-semibold text-slate-900 dark:text-slate-100">${item.name}</p>
+                                <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">${item.restaurantName}</p>
+                                <p class="mt-2 text-sm text-slate-700 dark:text-slate-300">₹${item.price} x ${item.quantity}</p>
+                            </div>
+                            <div class="flex h-10 items-center gap-2 rounded-full bg-slate-100 px-2 dark:bg-slate-800">
+                                <button onclick="updateCartItem('${item.id}', -1)" class="text-slate-500 hover:text-orange-600">−</button>
+                                <span class="text-sm font-semibold">${item.quantity}</span>
+                                <button onclick="updateCartItem('${item.id}', 1)" class="text-slate-500 hover:text-orange-600">+</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function updateCartItem(itemId, delta) {
+            const item = state.cart.find((entry) => entry.id === itemId);
+            if (!item) return;
+            item.quantity = Math.max(0, item.quantity + delta);
+            state.cart = state.cart.filter((entry) => entry.quantity > 0);
+            saveState();
+            renderCart();
+        }
+
+        function addToCart(menuItem, restaurant) {
+            const existing = state.cart.find((item) => item.id === menuItem.id);
+            if (existing) {
+                existing.quantity += 1;
+            } else {
+                state.cart.push({ ...menuItem, quantity: 1, restaurantId: restaurant.id, restaurantName: restaurant.name });
+            }
+            saveState();
+            renderCart();
+        }
+
+        function renderSkeletons() {
+            restaurantList.innerHTML = '';
+            for (let i = 0; i < 4; i += 1) {
+                restaurantList.innerHTML += `
+                    <div class="animate-pulse rounded-[2rem] border border-slate-200 bg-slate-100 p-6 dark:border-slate-700 dark:bg-slate-800">
+                        <div class="h-56 rounded-[1.6rem] bg-slate-200 dark:bg-slate-700"></div>
+                        <div class="mt-5 h-5 w-3/4 rounded-full bg-slate-200 dark:bg-slate-700"></div>
+                        <div class="mt-3 grid gap-3 sm:grid-cols-2">
+                            <div class="h-4 rounded-full bg-slate-200 dark:bg-slate-700"></div>
+                            <div class="h-4 rounded-full bg-slate-200 dark:bg-slate-700"></div>
+                        </div>
+                        <div class="mt-4 h-10 w-32 rounded-full bg-slate-200 dark:bg-slate-700"></div>
+                    </div>
+                `;
+            }
+        }
+
+        function renderRestaurants() {
+            restaurantsCount.textContent = state.filteredRestaurants.length;
+            restaurantList.innerHTML = '';
+
+            if (!state.filteredRestaurants.length) {
+                restaurantList.innerHTML = '<div class="rounded-[2rem] border border-dashed border-slate-300 bg-white/60 p-12 text-center text-slate-500 dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-400">No restaurants matched your search. Try a different keyword.</div>';
+                return;
+            }
+
+            state.filteredRestaurants.forEach((restaurant, index) => {
+                const image = restaurant.image || fallbackImages[index % fallbackImages.length];
+                const menu = getMenuForRestaurant(restaurant.id);
+                restaurantList.innerHTML += `
+                    <article class="rounded-[2rem] border border-slate-200 bg-white p-5 shadow-soft transition duration-300 hover:-translate-y-1 hover:border-orange-200 dark:border-slate-800 dark:bg-slate-900">
+                        <div class="grid gap-5 lg:grid-cols-[1.2fr_1fr]">
+                            <div class="space-y-4">
+                                <img src="${image}" alt="${restaurant.name}" class="h-64 w-full rounded-[1.6rem] object-cover" />
+                                <div class="space-y-2">
+                                    <div class="flex flex-wrap items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
+                                        <span>${restaurant.cuisine ? restaurant.cuisine.join(', ') : 'Popular'}</span>
+                                        <span>•</span>
+                                        <span>${restaurant.delivery_time || '30 mins'}</span>
+                                    </div>
+                                    <div class="flex items-center justify-between gap-4">
+                                        <div>
+                                            <h4 class="text-2xl font-semibold text-slate-900 dark:text-slate-100">${restaurant.name}</h4>
+                                            <p class="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-400">${restaurant.description || 'Crafted meals from the best chefs in town.'}</p>
+                                        </div>
+                                        <div class="rounded-3xl bg-slate-50 px-4 py-2 text-sm font-semibold text-slate-800 dark:bg-slate-950 dark:text-slate-200">⭐ ${restaurant.rating || '4.8'}</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="space-y-4">
+                                <div class="rounded-[1.6rem] border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-950">
+                                    <h5 class="text-lg font-semibold text-slate-900 dark:text-slate-100">Popular dishes</h5>
+                                    <div class="mt-4 space-y-4">
+                                        ${menu.slice(0, 3).map((dish) => `
+                                            <div class="flex items-center gap-3 rounded-3xl bg-white p-3 shadow-sm dark:bg-slate-900">
+                                                <img src="${dish.image}" alt="${dish.name}" class="h-16 w-16 rounded-2xl object-cover" />
+                                                <div class="grow">
+                                                    <p class="font-semibold text-slate-900 dark:text-slate-100">${dish.name}</p>
+                                                    <p class="text-xs text-slate-500 dark:text-slate-400">${dish.description}</p>
+                                                </div>
+                                                <div class="space-y-2 text-right">
+                                                    <p class="text-sm font-semibold text-slate-900 dark:text-slate-100">₹${dish.price}</p>
+                                                    <button onclick='addToCart(${JSON.stringify(dish)}, ${JSON.stringify(restaurant)})' class="rounded-full bg-orange-500 px-3 py-2 text-xs font-semibold text-white transition hover:bg-orange-600">Add</button>
+                                                </div>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                                <button onclick="selectRestaurant('${restaurant.id}')" class="w-full rounded-3xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-900 transition hover:border-orange-300 hover:bg-orange-50 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100">View menu</button>
+                            </div>
+                        </div>
+                    </article>
+                `;
+            });
+        }
+
+        function renderOrderHistory() {
+            historyCount.textContent = state.orderHistory.length;
+            orderHistoryList.innerHTML = '';
+
+            if (!state.orderHistory.length) {
+                orderHistoryList.innerHTML = '<div class="rounded-[2rem] border border-dashed border-slate-300 bg-slate-50 p-12 text-center text-slate-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400">No past orders yet. Place your first order to see history here.</div>';
+                return;
+            }
+
+            state.orderHistory.slice().reverse().forEach((order) => {
+                orderHistoryList.innerHTML += `
+                    <div class="rounded-[1.6rem] border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-950">
+                        <div class="flex flex-wrap items-start justify-between gap-3">
+                            <div>
+                                <p class="text-sm uppercase tracking-[0.25em] text-slate-500 dark:text-slate-400">${order.createdAt}</p>
+                                <h4 class="mt-2 text-xl font-semibold text-slate-900 dark:text-slate-100">${order.restaurantName}</h4>
+                                <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">${order.items.length} item(s) • ₹${order.total}</p>
+                            </div>
+                            <span class="rounded-full px-3 py-1 text-sm font-semibold ${order.status === 'DELIVERED' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300' : 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300'}">${order.status}</span>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function selectRestaurant(id) {
+            state.selectedRestaurantId = id;
+            const selected = state.restaurants.find((item) => item.id === id);
+            if (selected) {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                searchInput.value = selected.name;
+                filterRestaurants();
+            }
+        }
+
+        function filterRestaurants() {
+            const query = searchInput.value.trim().toLowerCase();
+            state.filteredRestaurants = state.restaurants.filter((restaurant) => {
+                const content = [restaurant.name, ...(restaurant.cuisine || [])].join(' ').toLowerCase();
+                return content.includes(query);
+            });
+            if (!query) {
+                state.filteredRestaurants = [...state.restaurants];
+            }
+            renderRestaurants();
+        }
+
+        async function fetchRestaurants() {
+            renderSkeletons();
+            try {
+                const response = await fetch(`${API_BASE}/restaurants`);
+                const data = await response.json();
+                state.restaurants = data.map((restaurant) => ({
+                    ...restaurant,
+                    description: restaurant.description || 'Crafted meals from the best chefs in town.',
+                }));
+                state.filteredRestaurants = [...state.restaurants];
+                state.loading = false;
+                renderRestaurants();
+                restaurantsCount.textContent = state.restaurants.length;
+            } catch (error) {
+                restaurantList.innerHTML = '<div class="rounded-[2rem] border border-red-200 bg-red-50 p-12 text-center text-red-700 dark:border-red-600 dark:bg-red-950/40 dark:text-red-300">Unable to load restaurants at the moment. Please refresh.</div>';
+                console.error(error);
+            }
+        }
+
+        function createWebsocket() {
+            try {
+                const socket = new WebSocket(`${API_BASE.replace('https://', 'wss://').replace('http://', 'ws://')}/ws/orders`);
+                socket.addEventListener('open', () => {
+                    trackingStatus.textContent = 'Connected to live order tracking.';
+                });
+                socket.addEventListener('message', (event) => {
+                    const data = JSON.parse(event.data);
+                    trackingStatus.innerHTML = `Order <span class="font-semibold">${data.order_id}</span> status updated to <span class="font-semibold">${data.status}</span>.`;
+                    const order = state.orderHistory.find((entry) => entry.orderId === data.order_id);
+                    if (order) {
+                        order.status = data.status;
+                        saveState();
+                        renderOrderHistory();
+                    }
+                });
+                socket.addEventListener('close', () => {
+                    trackingStatus.textContent = 'Live tracking disconnected. Refresh to reconnect.';
+                });
+                socket.addEventListener('error', () => {
+                    trackingStatus.textContent = 'Live tracking is unavailable. Please check backend status.';
+                });
+            } catch (err) {
+                console.error(err);
+                trackingStatus.textContent = 'Could not connect to live tracking.';
+            }
+        }
+
+        async function placeOrder() {
+            if (!state.cart.length) {
+                alert('Add items to the cart before checkout.');
+                return;
+            }
+            const address = deliveryAddress.value.trim();
+            if (!address) {
+                alert('Please enter a delivery address.');
+                return;
+            }
+            const restaurantId = state.cart[0].restaurantId;
+            const orderPayload = {
+                user_name: 'Deepak',
+                restaurant_id: restaurantId,
+                delivery_address: address,
+                items: state.cart.map(({ name, quantity, price }) => ({ name, quantity, price })),
+            };
+
+            checkoutBtn.disabled = true;
+            checkoutBtn.textContent = 'Processing...';
+
+            try {
+                const response = await fetch(`${API_BASE}/orders`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(orderPayload),
+                });
+                const data = await response.json();
+                if (!data.success) throw new Error('Order submission failed');
+
+                const newOrder = {
+                    orderId: data.order.order_id,
+                    restaurantName: state.cart[0].restaurantName,
+                    items: state.cart.map(({ name, quantity, price }) => ({ name, quantity, price })),
+                    total: data.order.total_amount,
+                    status: data.order.status,
+                    createdAt: new Date().toLocaleString(),
+                };
+                state.orderHistory.push(newOrder);
+                saveState();
+                renderOrderHistory();
+                state.cart = [];
+                saveState();
+                renderCart();
+                trackingStatus.innerHTML = `<div class="rounded-3xl bg-emerald-50 p-4 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-200">Order placed successfully. Tracking updates in realtime.</div>`;
+                setView('history');
+            } catch (error) {
+                console.error(error);
+                trackingStatus.innerHTML = '<div class="rounded-3xl bg-red-50 p-4 text-red-700 dark:bg-red-950/40 dark:text-red-200">Unable to place order. Please try again.</div>';
+            } finally {
+                checkoutBtn.disabled = false;
+                checkoutBtn.textContent = 'Checkout';
+            }
+        }
+
+        function updateTheme() {
+            const isDark = document.documentElement.classList.toggle('dark');
+            themeToggle.textContent = isDark ? 'Light mode' : 'Dark mode';
+        }
+
+        searchForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+            filterRestaurants();
+        });
+
+        searchInput.addEventListener('input', () => {
+            filterRestaurants();
+        });
+
+        viewOrdersBtn.addEventListener('click', () => setView('history'));
+        showRestaurantsBtn.addEventListener('click', () => setView('restaurants'));
+        checkoutBtn.addEventListener('click', placeOrder);
+        themeToggle.addEventListener('click', updateTheme);
+
+        window.addEventListener('load', () => {
+            loadState();
+            fetchRestaurants();
+            createWebsocket();
+        });
+    </script>
+</body>
+
+</html>
