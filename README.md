@@ -39,8 +39,18 @@ pip install -r requirements.txt
         source venv/bin/activate
     
     3. Install all dependencies
-        pip install -r requirements.txt
         pip install -r requirements_live.txt
+        pip install -r requirements.txt
+        
     
     4. Run Backend
         uvicorn live_app:app --reload --host 0.0.0.0 --port 8000
+
+##Workflow of Order
+    → placed
+    → confirmed
+    → preparing
+    → ready
+    → picked_up
+    → on_the_way
+    → delivered

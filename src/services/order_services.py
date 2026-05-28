@@ -45,7 +45,7 @@ class OrderService:
             # Emit order placed event
             await self.emit_order_event(order, OrderStatus.PLACED)
 
-            logger.info(f"Order {order.order_id} placed successfully")
+            logger.info(f"Order {order.id} placed successfully")
             return order.to_dict()
         except Exception as e:
             await self.saga_manager.rollback_saga(saga_id)
@@ -154,8 +154,9 @@ class OrderService:
 
             session.commit()
             session.refresh(orm_order)
+            _ = orm_order.items
 
-        return self._convert_orm_order(orm_order)
+            return self._convert_orm_order(orm_order)
     
     async def notify_restaurant(self, order: Order):
         """Notify restaurant about new order"""
