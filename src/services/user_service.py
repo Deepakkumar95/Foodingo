@@ -20,6 +20,12 @@ class UserService:
                 select(ORMUser).where(ORMUser.user_id == user_id)
             ).scalars().first()
 
+    async def get_user_by_email(self, email: str) -> Optional[ORMUser]:
+        with self.session_factory() as session:
+            return session.execute(
+                select(ORMUser).where(ORMUser.email == email)
+            ).scalars().first()
+
     async def create_user(self, user_id: str, password: str, name: str, email: str = None, phone: str = None, user_type: str = "customer") -> ORMUser:
         existing = await self.get_user_by_user_id(user_id)
         if existing:
@@ -40,13 +46,13 @@ class UserService:
             session.refresh(user)
             return user
 
-    async def authenticate_user(self, user_id: str, password: str) -> Optional[ORMUser]:
-        user = await self.get_user_by_user_id(user_id)
+    async def authenticate_user(self, email: str, password: str) -> Optional[ORMUser]:
+        user = await self.get_user_by_email(email)
         if not user:
             return None
 
         if self.security.verify_password(password, user.password_hash):
             return user
 
-        logger.warning(f"Authentication failed for user {user_id}")
+        logger.warning(f"Authentication failed for user {email}")
         return None

@@ -11,7 +11,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.security import OAuth2PasswordRequestForm
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 from sqlalchemy import select
 from typing import Any
 
@@ -104,10 +104,18 @@ class OrderItem(BaseModel):
     price: float
 
 class OrderRequest(BaseModel):
-    user_name: str
     restaurant_id: str
     delivery_address: Union[str, Dict[str, Union[str, float]]]
     items: List[OrderItem]
+
+class SignupRequest(BaseModel):
+    name: str
+    email: EmailStr
+    password: str
+
+class LoginRequest(BaseModel):
+    email: EmailStr
+    password: str
 
 @app.on_event("startup")
 async def startup_event():
@@ -195,13 +203,54 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
     )
     return {"access_token": access_token, "token_type": "bearer"}
 
+@app.post("/auth/login", response_model=Token)
+async def login_with_email(payload: LoginRequest):
+    user = await user_service.authenticate_user(payload.email, payload.password)
+    if not user:
+        raise HTTPException(
+            status_code=401,
+            detail="Incorrect email or password",
+            headers={"WWW-Authenticate": "Bearer"}
+        )
+
+    access_token = create_access_token(
+        subject=user.user_id,
+        extra_claims={"user_type": user.user_type}
+    )
+    return {"access_token": access_token, "token_type": "bearer"}
+
+@app.post("/auth/signup")
+async def signup(payload: SignupRequest):
+    try:
+        user = await user_service.create_user(
+            user_id=payload.email,
+            password=payload.password,
+            name=payload.name,
+            email=payload.email,
+            user_type="customer"
+        )
+        return {"success": True, "user": user.to_dict()}
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@app.get("/orders")
+async def list_user_orders(current_user: ORMUser = Depends(get_current_user)):
+    def fetch_orders():
+        with get_session() as session:
+            results = session.execute(
+                select(ORMOrder).where(ORMOrder.user_id == current_user.user_id)
+            ).scalars().all()
+            return [order.to_dict() for order in results]
+
+    return await asyncio.to_thread(fetch_orders)
+
 
 @app.get("/users/me")
 async def read_current_user(current_user: ORMUser = Depends(get_current_user)):
     return {"success": True, "user": current_user.to_dict()}
 
 @app.post("/orders")
-async def place_order(order: OrderRequest):
+async def place_order(order: OrderRequest, current_user: ORMUser = Depends(get_current_user)):
     def fetch_restaurant():
         with get_session() as session:
             return session.execute(
@@ -227,7 +276,7 @@ async def place_order(order: OrderRequest):
         }
 
     order_payload = {
-        "user_id": order.user_name,
+        "user_id": current_user.user_id,
         "restaurant_id": order.restaurant_id,
         "delivery_address": delivery_address,
         "items": [item.dict() for item in order.items],
@@ -255,10 +304,12 @@ async def place_order(order: OrderRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/orders/{order_id}")
-async def get_order(order_id: str):
+async def get_order(order_id: str, current_user: ORMUser = Depends(get_current_user)):
     order = await platform.order_service.get_order(order_id)
     if not order:
         raise HTTPException(status_code=404, detail="Order not found")
+    if order.user_id != current_user.user_id and current_user.user_type != "admin":
+        raise HTTPException(status_code=403, detail="Forbidden")
     return {
         "success": True,
         "order": order.to_dict()
