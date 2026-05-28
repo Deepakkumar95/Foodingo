@@ -29,22 +29,39 @@ A complete, production-ready food delivery platform with advanced AI/ML capabili
 1. **Install dependencies**:
 ```bash
 pip install -r requirements.txt
+```
 
-##How to run the project
+## How to run the project
 
-    1. Create a new virtual environment
-        python -m venv venv
+1. Create a new virtual environment
+    ```bash
+    python -m venv venv
+    ```
 
-    2. Activate the virtual environment
-        source venv/bin/activate
-    
-    3. Install all dependencies
-        pip install -r requirements_live.txt
-        pip install -r requirements.txt
-        
-    
-    4. Run Backend
-        uvicorn live_app:app --reload --host 0.0.0.0 --port 8000
+2. Activate the virtual environment
+    ```bash
+    source venv/bin/activate
+    ```
+
+3. Install all dependencies
+    ```bash
+    pip install -r requirements_live.txt
+    pip install -r requirements.txt
+    ```
+
+4. Run Backend
+    ```bash
+    uvicorn live_app:app --reload --host 0.0.0.0 --port 8000
+    ```
+
+5. Run Frontend
+    ```bash
+    cd frontend
+    npm install
+    npm run dev
+    ```
+
+> Note: `npm run dev` must be run from the `frontend` directory because the root repository does not contain a `package.json` for the frontend app.
 
 ##Workflow of Order
     → placed

@@ -1,5 +1,5 @@
 const API_BASE_URL =
-  "https://musical-doodle-v6vxrrg9pgwc6wq9-8000.app.github.dev";
+  "https://potential-adventure-5gqwrr4jvrph459r-8000.app.github.dev";
 
 export async function getRestaurants() {
   try {
@@ -14,7 +14,9 @@ export async function getRestaurants() {
     );
 
     if (!response.ok) {
-      throw new Error("Failed to fetch restaurants");
+      throw new Error(
+        "Failed to fetch restaurants"
+      );
     }
 
     return await response.json();
@@ -24,16 +26,23 @@ export async function getRestaurants() {
   }
 }
 
-export async function getRestaurant(id: string) {
+export async function getRestaurant(
+  id: string
+) {
   try {
-    const restaurants = await getRestaurants();
+    const restaurants =
+      await getRestaurants();
 
     return restaurants.find(
       (restaurant: any) =>
         restaurant.restaurant_id === id
     );
   } catch (error) {
-    console.error("Restaurant Error:", error);
+    console.error(
+      "Restaurant Error:",
+      error
+    );
+
     return null;
   }
 }

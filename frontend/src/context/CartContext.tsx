@@ -14,9 +14,10 @@ export function CartProvider({
 }: {
   children: React.ReactNode;
 }) {
+  // CART STATE
   const [cartItems, setCartItems] = useState<any[]>([]);
 
-  // LOAD CART FROM LOCAL STORAGE
+  // LOAD CART FROM LOCALSTORAGE
   useEffect(() => {
     const savedCart =
       localStorage.getItem("cart");
@@ -26,7 +27,7 @@ export function CartProvider({
     }
   }, []);
 
-  // SAVE CART TO LOCAL STORAGE
+  // SAVE CART TO LOCALSTORAGE
   useEffect(() => {
     localStorage.setItem(
       "cart",
@@ -73,8 +74,7 @@ export function CartProvider({
         item.id === id
           ? {
               ...item,
-              quantity:
-                item.quantity + 1,
+              quantity: item.quantity + 1,
             }
           : item
       )
@@ -109,11 +109,6 @@ export function CartProvider({
     );
   }
 
-  // CLEAR CART
-  function clearCart() {
-    setCartItems([]);
-  }
-
   return (
     <CartContext.Provider
       value={{
@@ -122,7 +117,6 @@ export function CartProvider({
         increaseQuantity,
         decreaseQuantity,
         removeFromCart,
-        clearCart,
       }}
     >
       {children}
