@@ -34,7 +34,7 @@ export default function RestaurantPage({
   }
 
   return (
-    <main className="min-h-screen bg-gray-100 p-8">
+    <main className="min-h-screen bg-gray-100 p-4 md:p-8 md:pr-96">
       {/* Restaurant Header */}
       <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
         <img

@@ -3,8 +3,8 @@
 import {
   createContext,
   useContext,
-  useState,
   useEffect,
+  useState,
 } from "react";
 
 const CartContext = createContext<any>(null);
@@ -14,7 +14,6 @@ export function CartProvider({
 }: {
   children: React.ReactNode;
 }) {
-  // CART STATE
   const [cartItems, setCartItems] = useState<any[]>([]);
 
   // LOAD CART FROM LOCAL STORAGE
@@ -43,7 +42,7 @@ export function CartProvider({
           cartItem.id === item.id
       );
 
-      // IF ITEM EXISTS → INCREASE QUANTITY
+      // IF ITEM EXISTS
       if (existingItem) {
         return prev.map((cartItem) =>
           cartItem.id === item.id
@@ -110,6 +109,11 @@ export function CartProvider({
     );
   }
 
+  // CLEAR CART
+  function clearCart() {
+    setCartItems([]);
+  }
+
   return (
     <CartContext.Provider
       value={{
@@ -118,6 +122,7 @@ export function CartProvider({
         increaseQuantity,
         decreaseQuantity,
         removeFromCart,
+        clearCart,
       }}
     >
       {children}
