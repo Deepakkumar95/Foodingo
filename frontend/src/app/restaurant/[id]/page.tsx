@@ -1,19 +1,34 @@
-import { getRestaurant } from "@/lib/api";
+"use client";
 
-export default async function RestaurantPage({
+import { useEffect, useState } from "react";
+import { getRestaurant } from "@/lib/api";
+import AddToCartButton from "@/components/AddToCartButton";
+
+export default function RestaurantPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
-  // Next.js 16 Fix
-  const { id } = await params;
+  const [restaurant, setRestaurant] =
+    useState<any>(null);
 
-  const restaurant = await getRestaurant(id);
+
+  useEffect(() => {
+    async function loadRestaurant() {
+      const { id } = await params;
+
+      const data = await getRestaurant(id);
+
+      setRestaurant(data);
+    }
+
+    loadRestaurant();
+  }, [params]);
 
   if (!restaurant) {
     return (
       <div className="p-10 text-2xl">
-        Restaurant not found
+        Loading...
       </div>
     );
   }
@@ -73,9 +88,7 @@ export default async function RestaurantPage({
                   ₹{item.price}
                 </span>
 
-                <button className="bg-orange-500 text-white px-4 py-2 rounded-xl hover:bg-orange-600 transition">
-                  Add to Cart
-                </button>
+                <AddToCartButton item={item} />
               </div>
             </div>
           ))}
