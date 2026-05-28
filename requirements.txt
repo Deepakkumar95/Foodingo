@@ -20,7 +20,6 @@ spacy>=3.5.0
 
 # Computer Vision
 Pillow>=9.4.0
-opencv-python>=4.7.0
 torchvision>=0.14.0
 
 # Audio Processing
@@ -36,6 +35,8 @@ fastapi>=0.95.0
 uvicorn>=0.21.0
 websockets>=11.0.0
 python-socketio>=5.8.0
+python-multipart>=0.0.6
+PyJWT>=2.8.0
 
 # Database
 sqlalchemy>=2.0.0

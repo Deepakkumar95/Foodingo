@@ -5,7 +5,8 @@ Main entry point for Food Delivery Platform
 
 import asyncio
 import logging
-from food_delivery_platform import FoodDeliveryPlatform
+from live_app import app
+from .food_delivery_platform import FoodDeliveryPlatform
 
 # Configure logging
 logging.basicConfig(

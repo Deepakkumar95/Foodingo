@@ -73,7 +73,7 @@ def get_admin_router(platform: Any) -> APIRouter:
             # write structured JSON-line audit entry
             try:
                 entry = {
-                    "ts": __import__("datetime").datetime.utcnow().isoformat(),
+                    "ts": __import__("datetime").datetime.now(__import__("datetime").timezone.utc).isoformat(),
                     "user_id": current_user.user_id,
                     "path": "/admin/system_health",
                     "status": "success"
@@ -85,7 +85,7 @@ def get_admin_router(platform: Any) -> APIRouter:
         except Exception as e:
             try:
                 entry = {
-                    "ts": __import__("datetime").datetime.utcnow().isoformat(),
+                    "ts": __import__("datetime").datetime.now(__import__("datetime").timezone.utc).isoformat(),
                     "user_id": current_user.user_id,
                     "path": "/admin/system_health",
                     "status": "error",

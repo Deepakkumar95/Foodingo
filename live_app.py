@@ -3,7 +3,7 @@ import asyncio
 import logging
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Dict, List, Optional, Union
 
 from fastapi import Depends, FastAPI, HTTPException, WebSocket, WebSocketDisconnect
@@ -278,7 +278,7 @@ async def health_check():
     return {
         "status": "ok",
         "initialized": platform.is_initialized,
-        "app_time": datetime.utcnow().isoformat()
+        "app_time": datetime.now(timezone.utc).isoformat()
     }
 
 
