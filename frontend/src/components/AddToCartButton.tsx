@@ -1,11 +1,11 @@
 "use client";
 
-import { useCart } from "@/context/CartContext";
+import { useCart, CartProduct } from "@/context/CartContext";
 
 export default function AddToCartButton({
   item,
 }: {
-  item: any;
+  item: CartProduct;
 }) {
   const { addToCart } = useCart();
 

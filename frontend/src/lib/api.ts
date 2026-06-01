@@ -1,13 +1,20 @@
 const API_BASE_URL =
-  "https://potential-adventure-5gqwrr4jvrph459r-8000.app.github.dev";
+  process.env.NEXT_PUBLIC_API_BASE_URL ||
+  "http://localhost:8000";
+
+const ENDPOINTS = {
+  RESTAURANTS: `${API_BASE_URL}/restaurants`,
+  SIGNUP: `${API_BASE_URL}/auth/signup`,
+  LOGIN: `${API_BASE_URL}/auth/login`,
+  USERS_ME: `${API_BASE_URL}/users/me`,
+  ORDERS: `${API_BASE_URL}/orders`,
+};
 
 
 // GET ALL RESTAURANTS
 export async function getRestaurants() {
   try {
-    const response = await fetch(
-      `${API_BASE_URL}/restaurants`
-    );
+    const response = await fetch(ENDPOINTS.RESTAURANTS);
 
     if (!response.ok) {
       throw new Error(
@@ -34,7 +41,7 @@ export async function getRestaurant(
 
     return restaurants.find(
       (restaurant: any) =>
-        restaurant.id === id
+        restaurant.restaurant_id === id || restaurant.id === id
     );
   } catch (error) {
     console.error("API ERROR:", error);
@@ -53,19 +60,13 @@ export async function signupUser(
   }
 ) {
   try {
-    const response = await fetch(
-      `${API_BASE_URL}/users/register`,
-      {
-        method: "POST",
-
-        headers: {
-          "Content-Type":
-            "application/json",
-        },
-
-        body: JSON.stringify(userData),
-      }
-    );
+    const response = await fetch(ENDPOINTS.SIGNUP, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(userData),
+    });
 
     if (!response.ok) {
       throw new Error("Signup failed");
@@ -86,32 +87,13 @@ export async function loginUser(
   password: string
 ) {
   try {
-    const formData =
-      new URLSearchParams();
-
-    formData.append(
-      "username",
-      email
-    );
-
-    formData.append(
-      "password",
-      password
-    );
-
-    const response = await fetch(
-      `${API_BASE_URL}/token`,
-      {
-        method: "POST",
-
-        headers: {
-          "Content-Type":
-            "application/x-www-form-urlencoded",
-        },
-
-        body: formData,
-      }
-    );
+    const response = await fetch(ENDPOINTS.LOGIN, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email, password }),
+    });
 
     if (!response.ok) {
       throw new Error("Login failed");
@@ -125,6 +107,53 @@ export async function loginUser(
   }
 }
 
+export async function fetchCurrentUser(token?: string) {
+  try {
+    const authToken = token || localStorage.getItem("token");
+    if (!authToken) {
+      throw new Error("Missing authentication token");
+    }
+
+    const response = await fetch(ENDPOINTS.USERS_ME, {
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch user profile");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("USER FETCH ERROR:", error);
+    throw error;
+  }
+}
+
+export async function fetchOrders(token?: string) {
+  try {
+    const authToken = token || localStorage.getItem("token");
+    if (!authToken) {
+      throw new Error("Missing authentication token");
+    }
+
+    const response = await fetch(ENDPOINTS.ORDERS, {
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch orders");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("ORDER FETCH ERROR:", error);
+    throw error;
+  }
+}
 
 // PLACE ORDER
 export async function placeOrder(
@@ -132,21 +161,14 @@ export async function placeOrder(
   token: string
 ) {
   try {
-    const response = await fetch(
-      `${API_BASE_URL}/orders`,
-      {
-        method: "POST",
-
-        headers: {
-          "Content-Type":
-            "application/json",
-
-          Authorization: `Bearer ${token}`,
-        },
-
-        body: JSON.stringify(orderData),
-      }
-    );
+    const response = await fetch(ENDPOINTS.ORDERS, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(orderData),
+    });
 
     if (!response.ok) {
       throw new Error(

@@ -19,7 +19,7 @@ export default function SignupPage() {
     setError("");
 
     try {
-      await signupUser(name, email, password);
+      await signupUser({ name, email, password });
       const data = await loginUser(email, password);
       login(data.access_token);
       router.push("/");

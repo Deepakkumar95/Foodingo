@@ -1,6 +1,6 @@
 "use client";
 
-import { useCart } from "@/context/CartContext";
+import { useCart, CartItem } from "@/context/CartContext";
 
 export default function CartSidebar() {
   const {
@@ -11,7 +11,7 @@ export default function CartSidebar() {
   } = useCart();
 
   const total = cartItems.reduce(
-    (sum: number, item: any) =>
+    (sum: number, item: CartItem) =>
       sum + item.price * item.quantity,
     0
   );
@@ -29,7 +29,7 @@ export default function CartSidebar() {
       ) : (
         <>
           <div className="space-y-4">
-            {cartItems.map((item: any) => (
+            {cartItems.map((item: CartItem) => (
               <div
                 key={item.id}
                 className="border rounded-3xl p-4"

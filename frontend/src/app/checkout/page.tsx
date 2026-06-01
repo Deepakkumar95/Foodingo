@@ -2,26 +2,27 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useCart } from "@/context/CartContext";
+import { CartItem, useCart } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
 import { placeOrder } from "@/lib/api";
 
 export default function CheckoutPage() {
   const router = useRouter();
   const { cartItems, clearCart } = useCart();
-  const { isAuthenticated } = useAuth();
+  const { token } = useAuth();
   const [address, setAddress] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("COD");
   const [error, setError] = useState("");
 
   useEffect(() => {
-    if (!isAuthenticated) {
+    const savedToken = localStorage.getItem("token");
+    if (!savedToken) {
       router.push("/login");
     }
-  }, [isAuthenticated, router]);
+  }, [router]);
 
   const subtotal = cartItems.reduce(
-    (sum: number, item: any) => sum + item.price * item.quantity,
+    (sum: number, item: CartItem) => sum + item.price * item.quantity,
     0
   );
 
@@ -36,20 +37,30 @@ export default function CheckoutPage() {
     }
 
     try {
-      await placeOrder({
-        restaurant_id: cartItems[0]?.restaurant_id || "",
-        delivery_address: {
-          address_line: address,
-          latitude: 0,
-          longitude: 0,
+      const authToken = token || localStorage.getItem("token");
+      if (!authToken) {
+        setError("Please login before placing an order.");
+        router.push("/login");
+        return;
+      }
+
+      await placeOrder(
+        {
+          restaurant_id: cartItems[0]?.restaurant_id || "",
+          delivery_address: {
+            address_line: address,
+            latitude: 0,
+            longitude: 0,
+          },
+          items: cartItems.map((item: CartItem) => ({
+            id: item.id,
+            name: item.name,
+            quantity: item.quantity,
+            price: item.price,
+          })),
         },
-        items: cartItems.map((item: any) => ({
-          id: item.id,
-          name: item.name,
-          quantity: item.quantity,
-          price: item.price,
-        })),
-      });
+        authToken
+      );
 
       clearCart();
       router.push("/success");
@@ -107,7 +118,7 @@ export default function CheckoutPage() {
             <h2 className="text-3xl font-bold mb-6">Order Summary</h2>
 
             <div className="space-y-4">
-              {cartItems.map((item: any) => (
+              {cartItems.map((item: CartItem) => (
                 <div
                   key={item.id}
                   className="flex items-center justify-between"
