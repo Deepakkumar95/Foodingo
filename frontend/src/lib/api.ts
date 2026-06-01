@@ -1,4 +1,5 @@
 const API_BASE_URL =
+  process.env.API_BASE_URL ||
   process.env.NEXT_PUBLIC_API_BASE_URL ||
   "http://localhost:8000";
 
@@ -17,15 +18,28 @@ export async function getRestaurants() {
     const response = await fetch(ENDPOINTS.RESTAURANTS);
 
     if (!response.ok) {
-      throw new Error(
-        "Failed to fetch restaurants"
+      const text = await response.text();
+      console.error(
+        "API ERROR: Failed to fetch restaurants",
+        response.status,
+        text
       );
+      return [];
     }
 
-    return await response.json();
+    const clone = response.clone();
+    try {
+      return await response.json();
+    } catch (jsonError) {
+      const text = await clone.text();
+      console.error(
+        "API ERROR: Invalid restaurant JSON response",
+        text
+      );
+      return [];
+    }
   } catch (error) {
     console.error("API ERROR:", error);
-
     return [];
   }
 }
@@ -69,13 +83,13 @@ export async function signupUser(
     });
 
     if (!response.ok) {
-      throw new Error("Signup failed");
+      const text = await response.text();
+      throw new Error(text || "Signup failed");
     }
 
     return await response.json();
   } catch (error) {
     console.error("SIGNUP ERROR:", error);
-
     throw error;
   }
 }

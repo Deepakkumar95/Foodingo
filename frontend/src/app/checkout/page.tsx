@@ -36,6 +36,11 @@ export default function CheckoutPage() {
       return;
     }
 
+    if (cartItems.length === 0) {
+      setError("Your cart is empty. Add items before placing an order.");
+      return;
+    }
+
     try {
       const authToken = token || localStorage.getItem("token");
       if (!authToken) {
