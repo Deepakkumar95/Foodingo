@@ -163,7 +163,20 @@ export async function fetchOrders(token?: string) {
       throw new Error("Failed to fetch orders");
     }
 
-    return await response.json();
+    const json = await response.json();
+
+    // Normalize backend responses: backend may return an array of orders
+    if (Array.isArray(json)) {
+      return { orders: json };
+    }
+
+    // If backend returns { orders: [...] } or similar, return as-is
+    if (json && typeof json === "object" && json.orders) {
+      return json;
+    }
+
+    // Fallback
+    return { orders: [] };
   } catch (error) {
     console.error("ORDER FETCH ERROR:", error);
     throw error;

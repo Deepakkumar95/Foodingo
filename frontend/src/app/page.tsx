@@ -7,19 +7,7 @@ export default async function Home() {
 
   return (
     <main className="min-h-screen bg-gray-100">
-      {/* Navbar */}
-      <nav className="bg-orange-500 text-white px-8 py-4 flex justify-between items-center">
-        <h1 className="text-3xl font-bold">
-          Foodingo
-        </h1>
-
-        <div className="flex gap-6 text-lg">
-          <button>Home</button>
-          <button>Orders</button>
-          <button>Cart</button>
-          <button>Login</button>
-        </div>
-      </nav>
+      {/* Navbar is provided by RootLayout */}
 
       {/* Hero */}
       <section className="text-center py-16">
@@ -31,13 +19,16 @@ export default async function Home() {
           Fast delivery from your favorite restaurants
         </p>
 
-        <button className="mt-8 bg-orange-500 text-white px-6 py-3 rounded-xl text-lg">
+        <a
+          href="#restaurants"
+          className="mt-8 inline-block bg-orange-500 text-white px-6 py-3 rounded-xl text-lg"
+        >
           Explore Restaurants
-        </button>
+        </a>
       </section>
 
       {/* Restaurants */}
-      <section className="px-8 pb-16">
+      <section id="restaurants" className="px-8 pb-16">
         <h3 className="text-3xl font-bold mb-8">
           Popular Restaurants
         </h3>

@@ -5,11 +5,15 @@ const BACKEND =
 
 export async function GET(req: Request) {
   try {
-    const auth = req.headers.get("authorization") || undefined;
+    const auth = req.headers.get("authorization");
+
+    const getHeaders: Record<string, string> | undefined = auth
+      ? { Authorization: auth }
+      : undefined;
 
     const res = await fetch(`${BACKEND}/orders`, {
       method: "GET",
-      headers: auth ? { Authorization: auth } : undefined,
+      headers: getHeaders,
     });
 
     const text = await res.text();
@@ -27,11 +31,19 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const auth = req.headers.get("authorization") || undefined;
+    const auth = req.headers.get("authorization");
+
+    const postHeaders: Record<string, string> = {
+      "Content-Type": "application/json",
+    };
+
+    if (auth) {
+      postHeaders["Authorization"] = auth;
+    }
 
     const res = await fetch(`${BACKEND}/orders`, {
       method: "POST",
-      headers: Object.assign({ "Content-Type": "application/json" }, auth ? { Authorization: auth } : {}),
+      headers: postHeaders,
       body: JSON.stringify(body),
     });
 

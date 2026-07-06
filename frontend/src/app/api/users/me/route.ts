@@ -5,11 +5,15 @@ const BACKEND =
 
 export async function GET(req: Request) {
   try {
-    const auth = req.headers.get("authorization") || undefined;
+    const auth = req.headers.get("authorization");
+
+    const headers: Record<string, string> | undefined = auth
+      ? { Authorization: auth }
+      : undefined;
 
     const res = await fetch(`${BACKEND}/users/me`, {
       method: "GET",
-      headers: auth ? { Authorization: auth } : undefined,
+      headers,
     });
 
     const text = await res.text();
