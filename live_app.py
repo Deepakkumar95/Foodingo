@@ -82,7 +82,7 @@ restaurants = [
         "delivery_time": "20 mins",
         "cuisine": ["Indian", "Chinese"],
         "description": "Flavorful Indian and Asian fusion favorites.",
-        "image": "https://images.unsplash.com/photo-1601924638867-3ec8a9b4f6c1?auto=format&fit=crop&w=900&q=80"
+        "image": "https://images.unsplash.com/photo-1498654896293-37aacf113fd9?auto=format&fit=crop&w=900&q=80"
     },
     {
         "id": "r2",
@@ -91,7 +91,7 @@ restaurants = [
         "delivery_time": "30 mins",
         "cuisine": ["Italian", "Fast Food"],
         "description": "Wood-fired pizza, garlic bread, and more.",
-        "image": "https://images.unsplash.com/photo-1548365328-9b5132e4c511?auto=format&fit=crop&w=900&q=80"
+        "image": "https://images.unsplash.com/photo-1550547660-d9450f859349?auto=format&fit=crop&w=900&q=80"
     }
 ]
 

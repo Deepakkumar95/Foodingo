@@ -12,6 +12,7 @@ export interface CartProduct {
   name: string;
   price: number;
   restaurant_id?: string;
+  image?: string;
 }
 
 export interface CartItem extends CartProduct {

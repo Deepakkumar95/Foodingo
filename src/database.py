@@ -52,15 +52,15 @@ def init_db():
                 "name": "Spice Garden",
                 "description": "Flavorful Indian and Asian fusion favorites.",
                 "cuisine": json.dumps(["Indian", "Chinese"]),
-                "image": "https://images.unsplash.com/photo-1601924638867-3ec8a9b4f6c1?auto=format&fit=crop&w=900&q=80",
+                "image": "https://images.unsplash.com/photo-1498654896293-37aacf113fd9?auto=format&fit=crop&w=900&q=80",
                 "rating": 4.7,
                 "delivery_time": "20 mins",
                 "min_order": 150.0,
                 "delivery_fee": 35.0,
                 "is_active": True,
                 "menu_json": json.dumps([
-                    {"id": "m1", "name": "Paneer Tikka", "description": "Smoky paneer cubes with rich masala", "price": 260, "image": "https://images.unsplash.com/photo-1601924638867-3ec8a9b4f6c1?auto=format&fit=crop&w=900&q=80"},
-                    {"id": "m2", "name": "Butter Naan", "description": "Soft butter naan baked in clay oven", "price": 60, "image": "https://images.unsplash.com/photo-1512058564366-c9e5b2d63c72?auto=format&fit=crop&w=900&q=80"}
+                    {"id": "m1", "name": "Paneer Tikka", "description": "Smoky paneer cubes with rich masala", "price": 260, "image": "https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?auto=format&fit=crop&w=900&q=80"},
+                    {"id": "m2", "name": "Butter Naan", "description": "Soft butter naan baked in clay oven", "price": 60, "image": "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?auto=format&fit=crop&w=900&q=80"}
                 ])
             },
             {
@@ -68,15 +68,15 @@ def init_db():
                 "name": "Pizza Hub",
                 "description": "Wood-fired pizza, garlic bread, and more.",
                 "cuisine": json.dumps(["Italian", "Fast Food"]),
-                "image": "https://images.unsplash.com/photo-1548365328-9b5132e4c511?auto=format&fit=crop&w=900&q=80",
+                "image": "https://images.unsplash.com/photo-1550547660-d9450f859349?auto=format&fit=crop&w=900&q=80",
                 "rating": 4.5,
                 "delivery_time": "30 mins",
                 "min_order": 200.0,
                 "delivery_fee": 40.0,
                 "is_active": True,
                 "menu_json": json.dumps([
-                    {"id": "m3", "name": "Margherita Pizza", "description": "Classic tomato & mozzarella delight", "price": 380, "image": "https://images.unsplash.com/photo-1548365328-9b5132e4c511?auto=format&fit=crop&w=900&q=80"},
-                    {"id": "m4", "name": "Garlic Breadsticks", "description": "Crispy garlic bread with cheese dip", "price": 120, "image": "https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=900&q=80"}
+                    {"id": "m3", "name": "Margherita Pizza", "description": "Classic tomato & mozzarella delight", "price": 380, "image": "https://images.unsplash.com/photo-1550547660-d9450f859349?auto=format&fit=crop&w=900&q=80"},
+                    {"id": "m4", "name": "Garlic Breadsticks", "description": "Crispy garlic bread with cheese dip", "price": 120, "image": "https://images.unsplash.com/photo-1498654896293-37aacf113fd9?auto=format&fit=crop&w=900&q=80"}
                 ])
             }
         ]

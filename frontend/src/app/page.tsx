@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getRestaurants } from "@/lib/api";
+import RestaurantImage from "@/components/RestaurantImage";
 
 export default async function Home() {
   const restaurants = await getRestaurants();
@@ -48,9 +49,10 @@ export default async function Home() {
               href={`/restaurant/${restaurant.restaurant_id}`}
             >
               <div className="bg-white rounded-2xl shadow-lg overflow-hidden hover:scale-105 transition">
-                <img
-                  src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=900&q=80"
+                <RestaurantImage
+                  src={restaurant.image}
                   alt={restaurant.name}
+                  fallbackSrc={`https://images.unsplash.com/photo-1550547660-d9450f859349?auto=format&fit=crop&w=900&q=80`}
                   className="h-48 w-full object-cover"
                 />
 
