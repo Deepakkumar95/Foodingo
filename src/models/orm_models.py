@@ -77,11 +77,20 @@ class Order(Base):
         except Exception:
             address = self.delivery_address
 
+        restaurant_info = None
+        if self.restaurant is not None:
+            restaurant_info = {
+                "restaurant_id": self.restaurant.restaurant_id,
+                "name": self.restaurant.name,
+                "image": self.restaurant.image,
+            }
+
         return {
             "id": self.id,
             "order_id": self.order_id,
             "user_id": self.user_id,
             "restaurant_id": self.restaurant_id,
+            "restaurant": restaurant_info,
             "total_amount": self.total_amount,
             "status": self.status,
             "payment_status": self.payment_status,

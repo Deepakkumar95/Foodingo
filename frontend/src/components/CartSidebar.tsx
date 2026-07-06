@@ -1,14 +1,20 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import { useCart, CartItem } from "@/context/CartContext";
 
 export default function CartSidebar() {
+  const pathname = usePathname();
   const {
     cartItems,
     increaseQuantity,
     decreaseQuantity,
     removeFromCart,
   } = useCart();
+
+  if (pathname === "/orders") {
+    return null;
+  }
 
   const total = cartItems.reduce(
     (sum: number, item: CartItem) =>

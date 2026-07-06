@@ -139,7 +139,8 @@ export async function fetchCurrentUser(token?: string) {
       throw new Error("Failed to fetch user profile");
     }
 
-    return await response.json();
+    const json = await response.json();
+    return json;
   } catch (error) {
     console.error("USER FETCH ERROR:", error);
     throw error;
@@ -165,20 +166,124 @@ export async function fetchOrders(token?: string) {
 
     const json = await response.json();
 
-    // Normalize backend responses: backend may return an array of orders
     if (Array.isArray(json)) {
       return { orders: json };
     }
 
-    // If backend returns { orders: [...] } or similar, return as-is
-    if (json && typeof json === "object" && json.orders) {
-      return json;
+    if (json && typeof json === "object") {
+      if (json.orders) {
+        return json;
+      }
+      if (json.order) {
+        return { orders: [json.order] };
+      }
     }
 
-    // Fallback
     return { orders: [] };
   } catch (error) {
     console.error("ORDER FETCH ERROR:", error);
+    throw error;
+  }
+}
+
+export async function getOrder(orderId: string, token?: string) {
+  try {
+    const authToken = token || localStorage.getItem("token");
+    if (!authToken) {
+      throw new Error("Missing authentication token");
+    }
+
+    const response = await fetch(`${ENDPOINTS.ORDERS}/${orderId}`, {
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch order details");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("ORDER DETAIL ERROR:", error);
+    throw error;
+  }
+}
+
+export async function cancelOrder(orderId: string, token?: string) {
+  try {
+    const authToken = token || localStorage.getItem("token");
+    if (!authToken) {
+      throw new Error("Missing authentication token");
+    }
+
+    const response = await fetch(`${ENDPOINTS.ORDERS}/${orderId}/cancel`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+      },
+    });
+
+    if (!response.ok) {
+      const text = await response.text();
+      throw new Error(text || "Failed to cancel order");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("CANCEL ORDER ERROR:", error);
+    throw error;
+  }
+}
+
+export async function getAdminOrders(token?: string) {
+  try {
+    const authToken = token || localStorage.getItem("token");
+    if (!authToken) {
+      throw new Error("Missing authentication token");
+    }
+
+    const response = await fetch(`/api/admin/orders`, {
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch admin orders");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("ADMIN ORDERS ERROR:", error);
+    throw error;
+  }
+}
+
+export async function updateOrderStatus(orderId: string, status: string, token?: string) {
+  try {
+    const authToken = token || localStorage.getItem("token");
+    if (!authToken) {
+      throw new Error("Missing authentication token");
+    }
+
+    const response = await fetch(`/api/admin/orders/${orderId}/status`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${authToken}`,
+      },
+      body: JSON.stringify({ status }),
+    });
+
+    if (!response.ok) {
+      const text = await response.text();
+      throw new Error(text || "Failed to update order status");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("ADMIN ORDER STATUS ERROR:", error);
     throw error;
   }
 }

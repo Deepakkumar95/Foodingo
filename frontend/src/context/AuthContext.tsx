@@ -7,6 +7,7 @@ const AuthContext = createContext<any>(null);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [token, setToken] = useState<string | null>(null);
   const [user, setUser] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const storedToken = localStorage.getItem("token");
@@ -14,6 +15,44 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setToken(storedToken);
     }
   }, []);
+
+  useEffect(() => {
+    async function loadUser() {
+      const authToken = token || localStorage.getItem("token");
+      if (!authToken) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const response = await fetch("/api/users/me", {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch user");
+        }
+
+        const json = await response.json();
+        setUser(json.user || null);
+      } catch (error) {
+        console.error("AUTH LOAD USER ERROR:", error);
+        localStorage.removeItem("token");
+        setToken(null);
+        setUser(null);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    if (token) {
+      loadUser();
+    } else {
+      setLoading(false);
+    }
+  }, [token]);
 
   function login(accessToken: string) {
     localStorage.setItem("token", accessToken);
@@ -32,6 +71,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         token,
         user,
         setUser,
+        loading,
         login,
         logout,
         isAuthenticated: !!token,

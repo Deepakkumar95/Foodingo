@@ -9,17 +9,16 @@ import { placeOrder } from "@/lib/api";
 export default function CheckoutPage() {
   const router = useRouter();
   const { cartItems, clearCart } = useCart();
-  const { token } = useAuth();
+  const { token, isAuthenticated, loading } = useAuth();
   const [address, setAddress] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("COD");
   const [error, setError] = useState("");
 
   useEffect(() => {
-    const savedToken = localStorage.getItem("token");
-    if (!savedToken) {
+    if (!loading && !isAuthenticated) {
       router.push("/login");
     }
-  }, [router]);
+  }, [isAuthenticated, loading, router]);
 
   const subtotal = cartItems.reduce(
     (sum: number, item: CartItem) => sum + item.price * item.quantity,

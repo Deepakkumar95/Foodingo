@@ -13,6 +13,7 @@ from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.security import OAuth2PasswordRequestForm
 from pydantic import BaseModel, EmailStr
 from sqlalchemy import select
+from sqlalchemy.orm import selectinload
 from typing import Any
 
 from src.api.admin import get_admin_router
@@ -238,7 +239,9 @@ async def list_user_orders(current_user: ORMUser = Depends(get_current_user)):
     def fetch_orders():
         with get_session() as session:
             results = session.execute(
-                select(ORMOrder).where(ORMOrder.user_id == current_user.user_id)
+                select(ORMOrder)
+                .options(selectinload(ORMOrder.restaurant))
+                .where(ORMOrder.user_id == current_user.user_id)
             ).scalars().all()
             return [order.to_dict() for order in results]
 
@@ -303,16 +306,56 @@ async def place_order(order: OrderRequest, current_user: ORMUser = Depends(get_c
         logger.error(f"Order placement error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.get("/orders/{order_id}")
-async def get_order(order_id: str, current_user: ORMUser = Depends(get_current_user)):
+@app.post("/orders/{order_id}/cancel")
+async def cancel_order(order_id: str, current_user: ORMUser = Depends(get_current_user)):
     order = await platform.order_service.get_order(order_id)
     if not order:
         raise HTTPException(status_code=404, detail="Order not found")
     if order.user_id != current_user.user_id and current_user.user_type != "admin":
         raise HTTPException(status_code=403, detail="Forbidden")
+    if order.status != "placed":
+        raise HTTPException(status_code=400, detail="Only placed orders can be cancelled")
+
+    await platform.order_service.update_order_status(order_id, OrderStatus.CANCELLED)
+
+    def fetch_order():
+        with get_session() as session:
+            orm_order = session.execute(
+                select(ORMOrder)
+                .options(selectinload(ORMOrder.restaurant))
+                .where(ORMOrder.order_id == order_id)
+            ).scalars().first()
+            if not orm_order:
+                return None
+            return orm_order.to_dict()
+
+    updated_order = await asyncio.to_thread(fetch_order)
+    if not updated_order:
+        raise HTTPException(status_code=500, detail="Order could not be loaded after cancellation")
+
+    return {"success": True, "order": updated_order}
+
+@app.get("/orders/{order_id}")
+async def get_order(order_id: str, current_user: ORMUser = Depends(get_current_user)):
+    def fetch_order():
+        with get_session() as session:
+            orm_order = session.execute(
+                select(ORMOrder)
+                .options(selectinload(ORMOrder.restaurant))
+                .where(ORMOrder.order_id == order_id)
+            ).scalars().first()
+            if not orm_order:
+                return None
+            return orm_order.to_dict()
+
+    order = await asyncio.to_thread(fetch_order)
+    if not order:
+        raise HTTPException(status_code=404, detail="Order not found")
+    if order["user_id"] != current_user.user_id and current_user.user_type != "admin":
+        raise HTTPException(status_code=403, detail="Forbidden")
     return {
         "success": True,
-        "order": order.to_dict()
+        "order": order
     }
 
 @app.get("/recommendations/{user_id}")
