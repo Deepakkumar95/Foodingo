@@ -5,10 +5,11 @@ const API_BASE_URL =
 
 const ENDPOINTS = {
   RESTAURANTS: `${API_BASE_URL}/restaurants`,
-  SIGNUP: `${API_BASE_URL}/auth/signup`,
-  LOGIN: `${API_BASE_URL}/auth/login`,
-  USERS_ME: `${API_BASE_URL}/users/me`,
-  ORDERS: `${API_BASE_URL}/orders`,
+  // use frontend proxy routes for auth so browser requests don't hit cross-origin
+  SIGNUP: `/api/auth/signup`,
+  LOGIN: `/api/auth/login`,
+  USERS_ME: `/api/users/me`,
+  ORDERS: `/api/orders`,
 };
 
 
